@@ -127,7 +127,7 @@ function promptForDomainAndType() {
       return;
     }
 
-    rl.question("Enter the record type (A, AAAA, CNAME, MX, NS, TXT): ", (type) => {
+    rl.question("Enter the record type (A, AAAA, CNAME, NS, TXT): ", (type) => {
       if (type.toUpperCase() === "-1") {
         console.log("Exiting...");
         rl.close(); // Close the readline interface

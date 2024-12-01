@@ -64,6 +64,31 @@ server.on("message", async (msg, rinfo) => {
 
   let answer;
   switch (record.type.toUpperCase()) {
+    case "TXT":
+      // Ensure the text field is valid
+      if (typeof record.text !== "string" || !record.text.trim()) {
+        console.error(`Invalid or missing 'text' field for TXT record of ${record.name}: ${record.text}`);
+        sendNotFoundResponse(incomingReq, rinfo);
+        return;
+      }
+      answer = {
+        type: "TXT",
+        class: "IN",
+        name: record.name,
+        data: record.text,
+      };
+      break;
+
+    case "AAAA":
+      // Ensure the IP is valid for 'AAAA' record (IPv6 address)
+      answer = {
+        type: "AAAA",
+        class: "IN",
+        name: record.name,
+        data: record.ip,
+      };
+      break;
+
     case "A":
       // Ensure the IP is valid for 'A' record
       if (!/^(\d{1,3}\.){3}\d{1,3}$/.test(record.ip)) {
@@ -132,10 +157,16 @@ function sendNotFoundResponse(incomingReq, rinfo) {
   });
 
   server.send(notFoundAns, rinfo.port, rinfo.address, (err) => {
+    sleep(3000);
     if (err) console.error("Error sending Not Found response:", err);
     else console.log(`Sent Not Found response for ${incomingReq.questions[0].name}`);
   });
 }
+
+function sleep(ms) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
 
 // Start the DNS server
 server.bind(69, () => {
@@ -290,4 +321,3 @@ server.bind(69, () => {
 //       console.error("MongoDB connection error:", err);
 //     });
 // });
-
